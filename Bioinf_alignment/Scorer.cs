@@ -22,6 +22,10 @@ namespace Bioinf_alignment
             gapfirst = vgapf;
             gapcont = vgapc;
         }
+        private int matchChars(char ch1, char ch2)
+        {
+            return (ch1 == ch2) ? match : mismatch;
+        }
       
         public Tuple<int,Directions> calcScoreAndPaths(SerialIterator cells, Boolean isGapOpening)
         {
@@ -29,13 +33,11 @@ namespace Bioinf_alignment
             AlignmentField matching = cells.getIncident(Directions.DIAG),
                             topgap = cells.getIncident(Directions.TOP),
                             leftgap = cells.getIncident(Directions.LEFT);
-            char ch1 = cells.getCurrent().Seq1char,
-                 ch2 = cells.getCurrent().Seq2char;
             Dictionary<Directions,int> possibleScores = new Dictionary<Directions,int>();
             int gapPenalty, charsCompareResult, score=0;
             Directions paths = Directions.NONE;
 
-            charsCompareResult = (ch1 == ch2) ? match : mismatch;
+            charsCompareResult = matchChars(cells.getCurrent().Seq1char, cells.getCurrent().Seq2char);
             gapPenalty = (isGapOpening) ? gapfirst : gapcont;
 
             #region CrappyCode
