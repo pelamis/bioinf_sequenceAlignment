@@ -22,9 +22,14 @@ namespace Bioinf_alignment
             gapfirst = vgapf;
             gapcont = vgapc;
         }
-        private int matchChars(char ch1, char ch2)
+        private int matchingCase(char ch1, char ch2, int cellScore)
         {
-            return (ch1 == ch2) ? match : mismatch;
+            return cellScore + ((ch1 == ch2) ? match : mismatch);
+        }
+
+        private int penaltyCase(bool isGapOpening, int cellScore)
+        {
+            return cellScore + ((isGapOpening) ? gapfirst : gapcont);
         }
       
         public Tuple<int,Directions> calcScoreAndPaths(SerialIterator cells, Boolean isGapOpening)
@@ -36,9 +41,21 @@ namespace Bioinf_alignment
             Dictionary<Directions,int> possibleScores = new Dictionary<Directions,int>();
             int gapPenalty, charsCompareResult, score=0;
             Directions paths = Directions.NONE;
-
+             //DIAG,TOP,LEFT
+            AlignmentField[] incidCells = new AlignmentField[3] {   cells.getIncident(Directions.DIAG),
+                                                                    cells.getIncident(Directions.TOP),
+                                                                    cells.getIncident(Directions.LEFT) };
+  
             charsCompareResult = matchChars(cells.getCurrent().Seq1char, cells.getCurrent().Seq2char);
             gapPenalty = (isGapOpening) ? gapfirst : gapcont;
+
+            Func<int,int>[] cellScorers = new Func<int, int>[3] { s => s + charsCompareResult, s => s + gapPenalty, s => s + gapPenalty};
+            
+            for (int i = 0; i < 3; i++)
+            {
+                if (incidCells[i] != null)
+                    if (incidCells[i])
+            }
 
             #region CrappyCode
             if (matching != null)
@@ -49,7 +66,7 @@ namespace Bioinf_alignment
 
             if (topgap != null)
                 possibleScores[Directions.TOP] = topgap.Score + gapPenalty;
-            #endregion
+            
 
             if (possibleScores.Count > 0)
             {
@@ -57,6 +74,7 @@ namespace Bioinf_alignment
                 foreach (KeyValuePair<Directions, int> entry in possibleScores)
                     if (entry.Value == score) paths |= entry.Key;
             }
+            #endregion
 
             return new Tuple<int, Directions>(score, paths);
         }
