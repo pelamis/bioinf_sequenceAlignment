@@ -35,37 +35,39 @@ namespace Bioinf_alignment
         public Tuple<int,Directions> calcScoreAndPaths(SerialIterator cells, Boolean isGapOpening)
         {
 
-            AlignmentField matching = cells.getIncident(Directions.DIAG),
-                            topgap = cells.getIncident(Directions.TOP),
-                            leftgap = cells.getIncident(Directions.LEFT);
-            Dictionary<Directions,int> possibleScores = new Dictionary<Directions,int>();
-            int gapPenalty, charsCompareResult, score=0;
-            Directions paths = Directions.NONE;
-             //DIAG,TOP,LEFT
+            //AlignmentField matching = cells.getIncident(Directions.DIAG),
+            //                topgap = cells.getIncident(Directions.TOP),
+            //                leftgap = cells.getIncident(Directions.LEFT);
             AlignmentField[] incidCells = new AlignmentField[3] {   cells.getIncident(Directions.DIAG),
                                                                     cells.getIncident(Directions.TOP),
                                                                     cells.getIncident(Directions.LEFT) };
-  
-            charsCompareResult = matchChars(cells.getCurrent().Seq1char, cells.getCurrent().Seq2char);
-            gapPenalty = (isGapOpening) ? gapfirst : gapcont;
+            
+            Dictionary<Directions,int> possibleScores = new Dictionary<Directions,int>();
+            
+            int gapPenalty = (isGapOpening) ? gapfirst : gapcont,
+                charsCompareResult = (cells.getCurrent().Seq1char == cells.getCurrent().Seq2char) ? match : mismatch, 
+                score = 0;
+           
+            Directions paths = Directions.NONE;
+            
+            Directions[] cellOrder = new Directions[3] {Directions.DIAG, Directions.TOP, Directions.LEFT};
 
             Func<int,int>[] cellScorers = new Func<int, int>[3] { s => s + charsCompareResult, s => s + gapPenalty, s => s + gapPenalty};
             
             for (int i = 0; i < 3; i++)
             {
-                if (incidCells[i] != null)
-                    if (incidCells[i])
+                if (incidCells[i] != null) possibleScores[cellOrder[i]] = cellScorers[i](incidCells[i].Score);
             }
 
             #region CrappyCode
-            if (matching != null)
-                possibleScores[Directions.DIAG] = matching.Score + charsCompareResult;
+            //if (matching != null)
+            //    possibleScores[Directions.DIAG] = matching.Score + charsCompareResult;
 
-            if (leftgap != null)
-                possibleScores[Directions.LEFT] = leftgap.Score + gapPenalty;
+            //if (leftgap != null)
+            //    possibleScores[Directions.LEFT] = leftgap.Score + gapPenalty;
 
-            if (topgap != null)
-                possibleScores[Directions.TOP] = topgap.Score + gapPenalty;
+            //if (topgap != null)
+            //    possibleScores[Directions.TOP] = topgap.Score + gapPenalty;
             
 
             if (possibleScores.Count > 0)
