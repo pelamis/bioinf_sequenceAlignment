@@ -145,6 +145,13 @@ namespace Bioinf_alignment
             }
             return (isEnd()) ? null : new SerialIterator(this);
         }
+    }
 
+    class BacktracingIterator
+    {
+        public BacktracingIterator next()
+        {
+
+        }
     }
 }

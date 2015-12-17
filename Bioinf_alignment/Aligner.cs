@@ -30,11 +30,11 @@ namespace Bioinf_alignment
 
             #region fillScoresAndPaths
             
-            for (cf=Data.createSerialIterator(); !cf.isEnd(); cf = cf.next()) {
+            for (cf=Data.createSerialIterator(); cf != null; cf = cf.next()) {
                 //Calculating score and getting path for current cell
                 scoreAndPath = ScoringSystem.calcScoreAndPaths(cf,isPossibleGapOpening);
-                //If there is a "match" path giving a highscore, supposing the previous gap closed and setting the flag in state "suppose new gap opening" 
-                if ((scoreAndPath.Item2 & Directions.DIAG) != 0) isPossibleGapOpening = true;
+                //Supposing an opening gap if current cell closes last gap or if we begin to proceed new row of the matrix
+                if (((scoreAndPath.Item2 & Directions.DIAG) != 0) || (cf.CurCol == 0)) isPossibleGapOpening = true;
                 else isPossibleGapOpening = false;
                 curCell = cf.getCurrent();
                 curCell.Score = scoreAndPath.Item1;

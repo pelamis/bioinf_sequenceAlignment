@@ -16,7 +16,7 @@ namespace Bioinf_alignment
         {
             string butt = "GATTACA";
             string head = "ATGCGAT";
-            Container teh = new Container(butt,head);
+            Container teh = new Container(head,butt);
             BasicScorer drama = new BasicScorer(1, -1, -1, -1);
             NeedlemanWunchAligner zomg = new NeedlemanWunchAligner(teh, drama);
 
