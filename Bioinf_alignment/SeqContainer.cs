@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//В ячейках таблицы лежат структуры <вес <edges>>
-
 namespace Bioinf_alignment
 {
     [Flags]
@@ -77,12 +75,7 @@ namespace Bioinf_alignment
             Matrix=new AlignmentField[Rows,Cols];
             for (int i = 0; i < Rows; i++)
                 for (int j = 0; j < Cols; j++)
-                {   
-                    //Console.WriteLine(s1[i - 1] + "\t" + s2[j - 1] + "\n");
-                    Matrix[i, j] = new AlignmentField(modS1[i], modS2[j]); 
-                    //Matrix[i, j].Seq1char = modS1[i];
-                    //Matrix[i, j].Seq2char = modS2[j];
-                }
+                  Matrix[i, j] = new AlignmentField(modS1[i], modS2[j]);               
         }
 
         public AlignmentField retrieveElem(int row, int col)
@@ -93,6 +86,11 @@ namespace Bioinf_alignment
         public SerialIterator createSerialIterator()
         {
             return new SerialIterator(this);
+        }
+
+        public BacktracingIterator createBacktracingIterator()
+        {
+            return new BacktracingIterator(Rows - 1, Cols - 1, this);
         }
 
     }
@@ -108,11 +106,11 @@ namespace Bioinf_alignment
             this.CurCol = this.CurRow = 0;
         }
 
-        private SerialIterator(SerialIterator copying)
+        private SerialIterator(Container data, int row, int col)
         {
-            this.Data = copying.Data;
-            this.CurCol = copying.CurCol;
-            this.CurRow = copying.CurRow;
+            this.Data = data;
+            this.CurCol = col;
+            this.CurRow = row;
         }
 
         public bool isEnd()
@@ -137,21 +135,71 @@ namespace Bioinf_alignment
 
         public SerialIterator next()
         {
-            if (CurCol + 1 < Data.Cols) CurCol++;
+            int col = CurCol, row = CurRow;
+            if (isEnd()) return this;
+            if (CurCol + 1 < Data.Cols) col++;
             else
             {
-                CurRow++;
-                CurCol = 0;
+                row++;
+                col = 0;
             }
-            return (isEnd()) ? null : new SerialIterator(this);
+            return new SerialIterator(Data, row, col);
         }
     }
 
     class BacktracingIterator
     {
+        public Container Data;
+        public int CurRow, CurCol;
+        public Directions pathTaken;
+
+        public BacktracingIterator(int startcol, int startrow, Container data)
+        {
+            Data = data;
+            pathTaken = Directions.NONE;
+            CurCol = startcol;
+            CurRow = startrow;
+        }
+
+        private BacktracingIterator(Container data, int row, int col, Directions newPath)
+        {
+            this.Data = data;
+            this.CurCol = col;
+            this.CurRow = row;
+            this.pathTaken = newPath;
+        }
+
+        public Directions choosePath(AlignmentField cell)
+        {
+            if ((cell.Pathes & Directions.DIAG) != 0) return Directions.DIAG;
+            if ((cell.Pathes & Directions.TOP) != 0) return Directions.TOP;
+            if ((cell.Pathes & Directions.LEFT) != 0) return Directions.LEFT;
+            return Directions.NONE;
+        }
+
+        public AlignmentField getCurrent()
+        {
+            return Data.retrieveElem(CurRow, CurCol);
+        }
+
+        public Boolean isEnd()
+        {
+            return (pathTaken == Directions.NONE);
+        }
+
         public BacktracingIterator next()
         {
-
+            int row = CurRow, col = CurCol;
+            Directions newPath = Directions.NONE;
+            switch (pathTaken)
+            {
+                case Directions.NONE: return this;
+                case Directions.DIAG: { row--; col--; break;}
+                case Directions.LEFT: { col--; break; }
+                case Directions.TOP: { row--; break; }
+            }
+            newPath = choosePath(Data.retrieveElem(CurRow, CurCol));
+            return new BacktracingIterator(Data, row, col, newPath);
         }
     }
 }

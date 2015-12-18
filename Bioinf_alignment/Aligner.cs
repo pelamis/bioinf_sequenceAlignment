@@ -30,10 +30,10 @@ namespace Bioinf_alignment
 
             #region fillScoresAndPaths
             
-            for (cf=Data.createSerialIterator(); cf != null; cf = cf.next()) {
+            for (cf=Data.createSerialIterator(); !cf.isEnd(); cf = cf.next()) {
                 //Calculating score and getting path for current cell
                 scoreAndPath = ScoringSystem.calcScoreAndPaths(cf,isPossibleGapOpening);
-                //Supposing an opening gap if current cell closes last gap or if we begin to proceed new row of the matrix
+                //Исправить этот кусок кода! Гэпы разных типов не должны смешиваться в один!
                 if (((scoreAndPath.Item2 & Directions.DIAG) != 0) || (cf.CurCol == 0)) isPossibleGapOpening = true;
                 else isPossibleGapOpening = false;
                 curCell = cf.getCurrent();
@@ -44,19 +44,21 @@ namespace Bioinf_alignment
             #endregion
         }
 
-        public void buildPath()
+        public void buildPathAndAlignment()
         {
+            BacktracingIterator cf;
+            for (cf = Data.createBacktracingIterator(); !cf.isEnd(); cf = cf.next())
+            {
+
+            }
 
         }
 
-        public void buildAlgnment()
-        {
-
-        }
 
         public void run()
         {
             fillTable();
+            buildPathAndAlignment();
         }
     }
 }
