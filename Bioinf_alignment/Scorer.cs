@@ -38,23 +38,30 @@ namespace Bioinf_alignment
             
             for (int i = 0; i < 3; i++)
                 if (incidCells[i] != null) possibleScores[cellOrder[i]] = cellScorers[i](incidCells[i].Score);
-     
-            #region CrappyCode        
+         
             if (possibleScores.Count > 0)
             {
                 score = cells.getCurrent().Score = possibleScores.Values.Max();
                 foreach (KeyValuePair<Directions, int> entry in possibleScores)
                     if (entry.Value == score) paths |= entry.Key;
             }
-            #endregion
 
             return new Tuple<int, Directions>(score, paths);
         }
     }
 
-    //class SimilarityMatrixScorer : Scorer
+    //class SimilarityMatrixScorer
     //{
 
+    //    public SimilarityMatrixScorer()
+    //    {
+
+    //    }
+
+    //    public Tuple<int, Directions> calcScoreAndPaths(SerialIterator cells, Boolean isGapOpening)
+    //    {
+    //        return null;
+    //    }
     //}
 
 }

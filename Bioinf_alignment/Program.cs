@@ -14,8 +14,8 @@ namespace Bioinf_alignment
         [STAThread]
         static void Main()
         {
-            string left = "GATTACA";
-            string up = "GCATGCU";
+            string left = "HEAGAWGHEE";
+            string up = "PAWHEAE";
             Container teh = new Container(left,up);
             BasicScorer drama = new BasicScorer(1, -1, -1, -1);
             NeedlemanWunchAligner zomg = new NeedlemanWunchAligner(teh, drama);

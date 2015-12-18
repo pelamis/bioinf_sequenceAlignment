@@ -22,20 +22,30 @@ namespace Bioinf_alignment
             SerialIterator cf;
             AlignmentField curCell;
             Tuple<int, Directions> scoreAndPath;
-            #region INIT
-
+            Directions gapType = Directions.NONE;
             bool isPossibleGapOpening = true;
-
-            #endregion
 
             #region fillScoresAndPaths
             
             for (cf=Data.createSerialIterator(); !cf.isEnd(); cf = cf.next()) {
                 //Получение скора и "стрелок" для ячейки
                 scoreAndPath = ScoringSystem.calcScoreAndPaths(cf,isPossibleGapOpening);
-                //Исправить этот кусок кода! Гэпы разных типов не должны смешиваться в один!
-                if (((scoreAndPath.Item2 & Directions.DIAG) != 0) || (cf.CurCol == 0)) isPossibleGapOpening = true;
+
+                #region BUGSPOSSIBLE
+                //Считаем, что новый гэп открывается в трёх случаях:
+                //1. В ячейке есть стрелка, соответсвующая сравнению (match/mismatch)
+                //2. Начали обрабатывать следующую строку матрицы
+                //3. Меняется тип гэпа (верхний/левый)
+                if (((scoreAndPath.Item2 & Directions.DIAG) != 0) || (cf.CurCol == 0) || (scoreAndPath.Item2 != gapType))
+                {
+                    isPossibleGapOpening = true;
+                    if ((scoreAndPath.Item2 & Directions.DIAG) != 0) gapType = Directions.NONE;
+                    if (cf.CurCol == 0) gapType = Directions.TOP;
+                    if (scoreAndPath.Item2 != gapType) gapType = scoreAndPath.Item2;
+                }
                 else isPossibleGapOpening = false;
+                #endregion
+
                 curCell = cf.getCurrent();
                 curCell.Score = scoreAndPath.Item1;
                 curCell.Pathes = scoreAndPath.Item2;
@@ -72,6 +82,7 @@ namespace Bioinf_alignment
                     }
                 }
             }
+
             leftStrAligned.Reverse();
             upperStrAligned.Reverse();
 
@@ -86,11 +97,17 @@ namespace Bioinf_alignment
             String s1="", s2="";
             fillTable();
             aligned = buildPathAndAlignment();
-            List<Char> strup = aligned.Item1,
-                strleft = aligned.Item2;
             foreach (Char ch in aligned.Item1) s1 += ch;  
             foreach (Char ch in aligned.Item2) s2 += ch;
             return new Tuple<string, string>(s1, s2);
         }
     }
+
+    //class SmithWatermanAligner
+    //{
+    //    public Container Data;
+    //    public BasicScorer ScoringSystem;
+
+    //    public SmithWatermanAligner(Container data, BasicScorer scorer)
+    //}
 }

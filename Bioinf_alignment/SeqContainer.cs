@@ -17,17 +17,14 @@ namespace Bioinf_alignment
 
     //interface Container<T>
     //{
-    //    T next();
     //    T retrieveElem(int row, int col);
-    //    T retrieveCurrentIncident(Directions pos);
-    //    T getCurrent();
+    //    ??? createIterator(...);
     //}
 
     //interface Iterator
     //{
     //    bool isEnd();
     //    AlignmentField getCurrent();
-    //    AlignmentField getIncident(Directions pos);
     //    //Iterator next();
     //}
 
@@ -148,10 +145,10 @@ namespace Bioinf_alignment
     }
 
     class BacktracingIterator
-    {
-        public Container Data;
+    {    
         public int CurRow, CurCol;
         public Directions pathTaken;
+        private Container Data;
 
         public BacktracingIterator(int startcol, int startrow, Container data)
         {
@@ -159,22 +156,6 @@ namespace Bioinf_alignment
             pathTaken = choosePath(Data.retrieveElem(startrow,startcol));
             CurCol = startcol;
             CurRow = startrow;
-        }
-
-        private BacktracingIterator(Container data, int row, int col, Directions newPath)
-        {
-            this.Data = data;
-            this.CurCol = col;
-            this.CurRow = row;
-            this.pathTaken = newPath;
-        }
-
-        public Directions choosePath(AlignmentField cell)
-        {
-            if ((cell.Pathes & Directions.DIAG) != 0) return Directions.DIAG;
-            if ((cell.Pathes & Directions.TOP) != 0) return Directions.TOP;
-            if ((cell.Pathes & Directions.LEFT) != 0) return Directions.LEFT;
-            return Directions.NONE;
         }
 
         public AlignmentField getCurrent()
@@ -201,5 +182,22 @@ namespace Bioinf_alignment
             newPath = choosePath(Data.retrieveElem(row, col));
             return new BacktracingIterator(Data, row, col, newPath);
         }
+
+        private BacktracingIterator(Container data, int row, int col, Directions newPath)
+        {
+            this.Data = data;
+            this.CurCol = col;
+            this.CurRow = row;
+            this.pathTaken = newPath;
+        }
+
+        private Directions choosePath(AlignmentField cell)
+        {
+            if ((cell.Pathes & Directions.DIAG) != 0) return Directions.DIAG;
+            if ((cell.Pathes & Directions.TOP) != 0) return Directions.TOP;
+            if ((cell.Pathes & Directions.LEFT) != 0) return Directions.LEFT;
+            return Directions.NONE;
+        }
+
     }
 }
