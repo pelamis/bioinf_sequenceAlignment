@@ -31,7 +31,7 @@ namespace Bioinf_alignment
             #region fillScoresAndPaths
             
             for (cf=Data.createSerialIterator(); !cf.isEnd(); cf = cf.next()) {
-                //Calculating score and getting path for current cell
+                //Получение скора и "стрелок" для ячейки
                 scoreAndPath = ScoringSystem.calcScoreAndPaths(cf,isPossibleGapOpening);
                 //Исправить этот кусок кода! Гэпы разных типов не должны смешиваться в один!
                 if (((scoreAndPath.Item2 & Directions.DIAG) != 0) || (cf.CurCol == 0)) isPossibleGapOpening = true;
@@ -44,21 +44,53 @@ namespace Bioinf_alignment
             #endregion
         }
 
-        public void buildPathAndAlignment()
+        public Tuple<List<Char>, List<Char>> buildPathAndAlignment()
         {
+            List<Char> leftStrAligned = new List<char>();
+            List<Char> upperStrAligned = new List<char>();
             BacktracingIterator cf;
             for (cf = Data.createBacktracingIterator(); !cf.isEnd(); cf = cf.next())
             {
-
+                switch (cf.pathTaken)
+                {
+                    case Directions.DIAG: {
+                        leftStrAligned.Add(cf.getCurrent().leftSeqChar);
+                        upperStrAligned.Add(cf.getCurrent().upSeqChar);
+                        break;
+                    }
+                    case Directions.LEFT:
+                    {
+                        leftStrAligned.Add('-');
+                        upperStrAligned.Add(cf.getCurrent().upSeqChar);
+                        break;
+                    }
+                    case Directions.TOP:
+                    {
+                        leftStrAligned.Add(cf.getCurrent().leftSeqChar);
+                        upperStrAligned.Add('-');
+                        break;
+                    }
+                }
             }
+            leftStrAligned.Reverse();
+            upperStrAligned.Reverse();
+
+            return new Tuple<List<Char>, List<Char>>(upperStrAligned, leftStrAligned);
 
         }
 
 
-        public void run()
+        public Tuple<String, String> run()
         {
+            Tuple<List<Char>, List<Char>> aligned;
+            String s1="", s2="";
             fillTable();
-            buildPathAndAlignment();
+            aligned = buildPathAndAlignment();
+            List<Char> strup = aligned.Item1,
+                strleft = aligned.Item2;
+            foreach (Char ch in aligned.Item1) s1 += ch;  
+            foreach (Char ch in aligned.Item2) s2 += ch;
+            return new Tuple<string, string>(s1, s2);
         }
     }
 }

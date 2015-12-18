@@ -30,7 +30,7 @@ namespace Bioinf_alignment
                                                                     cells.getIncident(Directions.LEFT) };
             Dictionary<Directions,int> possibleScores = new Dictionary<Directions,int>();           
             int gapPenalty = (isGapOpening) ? gapfirst : gapcont,
-                charsCompareResult = (cells.getCurrent().Seq1char == cells.getCurrent().Seq2char) ? match : mismatch, 
+                charsCompareResult = (cells.getCurrent().leftSeqChar == cells.getCurrent().upSeqChar) ? match : mismatch, 
                 score = 0;         
             Directions paths = Directions.NONE;          
             Directions[] cellOrder = new Directions[3] {Directions.DIAG, Directions.TOP, Directions.LEFT};

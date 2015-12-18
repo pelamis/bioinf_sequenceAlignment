@@ -14,14 +14,15 @@ namespace Bioinf_alignment
         [STAThread]
         static void Main()
         {
-            string butt = "GATTACA";
-            string head = "ATGCGAT";
-            Container teh = new Container(head,butt);
+            string left = "GATTACA";
+            string up = "GCATGCU";
+            Container teh = new Container(left,up);
             BasicScorer drama = new BasicScorer(1, -1, -1, -1);
             NeedlemanWunchAligner zomg = new NeedlemanWunchAligner(teh, drama);
-
-            zomg.run();
-
+            Tuple<String, String> res;
+            res = zomg.run();
+            System.Console.WriteLine(res.Item1);
+            System.Console.WriteLine(res.Item2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

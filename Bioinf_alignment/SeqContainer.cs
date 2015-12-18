@@ -34,29 +34,29 @@ namespace Bioinf_alignment
     class AlignmentField
     {
         public int Score;
-        public char Seq1char, Seq2char;
+        public char leftSeqChar, upSeqChar;
         public Directions Pathes;
 
         public AlignmentField()
         {
             Score = 0;
-            Seq1char = (char)0;
-            Seq2char = (char)0;
+            leftSeqChar = (char)0;
+            upSeqChar = (char)0;
             Pathes = Directions.NONE;
         }
         public AlignmentField(char ch1, char ch2)
         {
             Score = 0;
-            Seq1char = ch1;
-            Seq2char = ch2;
+            leftSeqChar = ch1;
+            upSeqChar = ch2;
             Pathes = Directions.NONE;
         }
 
         public AlignmentField(int score, char ch1, char ch2, Directions pathes)
         {
             Score = score;
-            Seq1char = ch1;
-            Seq2char = ch2;
+            leftSeqChar = ch1;
+            upSeqChar = ch2;
             Pathes = pathes;
         }
     }
@@ -66,10 +66,10 @@ namespace Bioinf_alignment
         private AlignmentField [,] Matrix;
         public readonly int Cols, Rows;
 
-        public Container(String s1, String s2)
+        public Container(String leftStr, String upperStr)
         {
-            String modS1 = (char)0x0 + s1;
-            String modS2 = (char)0x0 + s2;
+            String modS1 = (char)0x0 + leftStr;
+            String modS2 = (char)0x0 + upperStr;
             Cols = modS2.Length;
             Rows = modS1.Length;
             Matrix=new AlignmentField[Rows,Cols];
@@ -156,7 +156,7 @@ namespace Bioinf_alignment
         public BacktracingIterator(int startcol, int startrow, Container data)
         {
             Data = data;
-            pathTaken = Directions.NONE;
+            pathTaken = choosePath(Data.retrieveElem(startrow,startcol));
             CurCol = startcol;
             CurRow = startrow;
         }
@@ -198,7 +198,7 @@ namespace Bioinf_alignment
                 case Directions.LEFT: { col--; break; }
                 case Directions.TOP: { row--; break; }
             }
-            newPath = choosePath(Data.retrieveElem(CurRow, CurCol));
+            newPath = choosePath(Data.retrieveElem(row, col));
             return new BacktracingIterator(Data, row, col, newPath);
         }
     }
